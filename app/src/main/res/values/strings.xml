@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">TTK-2.0</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="tv_home">Дом</string>
+    <string name="tv_entrance">Подъезд</string>
+    <string name="tv_open">Открыть</string>
+    <string name="tv_settings">Параметры</string>
+    <string name="tv_open_auto">Автоматически открывать дверь</string>
+    <string name="tv_settings_description">Чтобы открывать дверь без запуска приложения, включите Bluetooth</string>
+    <string name="tv_share">Поделиться</string>
+    <string name="tv_use_qr">Поднесите экран телефона  к считывающему устройству</string>
+</resources>
