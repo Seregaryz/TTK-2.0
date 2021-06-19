@@ -18,8 +18,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_close"
             android:paddingVertical="16dp"
-            android:paddingStart="16dp"
-            android:paddingEnd="12dp"/>
+            android:paddingHorizontal="12dp"/>
 
         <TextView
             style="@style/titleText"

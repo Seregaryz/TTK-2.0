@@ -1,5 +1,6 @@
 package com.example.ttk_20.ui.keyless_access
 
+import android.animation.Animator
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.AdvertiseCallback
@@ -7,19 +8,27 @@ import android.bluetooth.le.AdvertiseSettings
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.model.KeyPath
 import com.example.ttk_20.databinding.FrKeylessAccessBinding
 import com.example.ttk_20.helper.BluetoothHelper
 import com.example.ttk_20.helper.BluetoothListener
 import com.example.ttk_20.ui.qr.QrCodeBottomSheetFragment
 import com.example.ttk_20.ui.settings.SettingsBottomSheetFragment
 import com.example.ttk_20.utils.addSystemTopPadding
+import com.example.ttk_20.utils.visible
+import com.example.ttk_20.R
 import dagger.hilt.android.AndroidEntryPoint
 import org.altbeacon.beacon.*
 import timber.log.Timber
@@ -35,19 +44,22 @@ class KeylessAccessFragment : Fragment(), BeaconConsumer,
     private lateinit var _binding: FrKeylessAccessBinding
     private val binding get() = _binding
 
-    var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            isBluetoothEnabled = true
-            startTransmit()
-        } else {
-            Toast.makeText(
-                requireContext(),
-                "Bluetooth permission denied",
-                Toast.LENGTH_LONG
-            ).show()
-            isBluetoothEnabled = false
+    private val viewModel: KeylessAccessViewModel by viewModels()
+
+    var resultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                isBluetoothEnabled = true
+                startTransmit()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Bluetooth permission denied",
+                    Toast.LENGTH_LONG
+                ).show()
+                isBluetoothEnabled = false
+            }
         }
-    }
 
     private var isBluetoothEnabled = false
 
@@ -75,9 +87,65 @@ class KeylessAccessFragment : Fragment(), BeaconConsumer,
             QrCodeBottomSheetFragment().show(childFragmentManager, null)
         }
         bluetoothHelper.initializeBluetooth(this)
-        binding.progressBar.apply {
-            loop(true)
-            playAnimation()
+        binding.btnOpenDoor.setOnClickListener {
+            binding.apply {
+                progressBar.visible(true)
+                doorIcon.visible(false)
+                progressBar.apply {
+                    playAnimation()
+                    addAnimatorListener(object : Animator.AnimatorListener {
+                        override fun onAnimationStart(animation: Animator?) {
+                        }
+
+                        override fun onAnimationEnd(animation: Animator?) {
+                            tvOpen.apply {
+                                text = getString(R.string.tv_opened)
+                                setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
+                            }
+                        }
+
+                        override fun onAnimationCancel(animation: Animator?) {
+                        }
+
+                        override fun onAnimationRepeat(animation: Animator?) {
+                        }
+
+                    })
+//                    addAnimatorPauseListener(object : Animator.AnimatorPauseListener {
+//                        override fun onAnimationPause(animation: Animator?) {
+//                            tvOpen.apply {
+//                                text = getString(R.string.tv_opened)
+//                                setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
+//                            }
+//                        }
+//
+//                        override fun onAnimationResume(animation: Animator?) {
+//                            TODO("Not yet implemented")
+//                        }
+//
+//                    })
+                    addValueCallback(
+                        KeyPath("**"),
+                        LottieProperty.COLOR_FILTER,
+                        {
+                             if (it.overallProgress < 0.6)
+                            PorterDuffColorFilter(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    com.example.ttk_20.R.color.colorSenary
+                                ),
+                                PorterDuff.Mode.SRC_ATOP
+                            ) else  PorterDuffColorFilter(
+                                 ContextCompat.getColor(
+                                     requireContext(),
+                                     com.example.ttk_20.R.color.green
+                                 ),
+                                 PorterDuff.Mode.SRC_ATOP
+                             )
+                        }
+                    )
+                }
+            }
         }
     }
 
@@ -148,7 +216,4 @@ class KeylessAccessFragment : Fragment(), BeaconConsumer,
         bluetoothHelper.enableBluetooth(this)
     }
 
-    companion object {
-        const val REQUEST_ENABLE_BLUETOOTH = 1
-    }
 }

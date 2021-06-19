@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.TTK20" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
@@ -103,6 +103,12 @@
         <item name="android:textAppearance">@style/body1</item>
         <item name="colorOnSurface">@color/colorSenary</item>
         <item name="colorSecondary">@color/colorSenary</item>
+    </style>
+
+    <style name="AppTheme.Splash">
+        <item name="colorPrimaryDark">@color/colorSenary</item>
+        <item name="colorAccent">@color/colorSenary</item>
+        <item name="android:windowBackground">@drawable/bg_splash</item>
     </style>
 
 </resources>
