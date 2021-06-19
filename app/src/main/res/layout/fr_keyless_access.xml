@@ -43,11 +43,27 @@
             android:padding="16dp"
             android:background="@drawable/bg_card">
 
-            <ImageView
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
-                android:src="@drawable/ic_door"/>
+                android:layout_marginBottom="32dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_door"
+                    android:visibility="invisible"/>
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/progressBar"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    app:lottie_autoPlay="true"
+                    app:lottie_colorFilter="@color/green"
+                    app:lottie_rawRes="@raw/door"
+                    app:lottie_speed="0.5" />
+
+            </FrameLayout>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -85,14 +101,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/body1"
-                android:text="@string/tv_entrance"/>
+                android:text="@string/tv_qr"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/Caption1"
-                android:text="@string/tv_open"
-                android:textColor="@color/colorSenary"/>
+                android:text="@string/tv_qr_description"
+                android:textColor="@color/colorSecondary"/>
 
         </LinearLayout>
 

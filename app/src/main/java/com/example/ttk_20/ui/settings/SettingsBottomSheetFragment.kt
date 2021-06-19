@@ -6,17 +6,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.fragment.app.viewModels
 import com.example.ttk_20.R
 import com.example.ttk_20.databinding.FrSettingsBottomSheetBinding
 import com.example.ttk_20.utils.registerOnBackPressedCallback
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SettingsBottomSheetFragment : BottomSheetDialogFragment() {
 
     private lateinit var _binding: FrSettingsBottomSheetBinding
     private val binding get() = _binding
+
+    private val viewModel: SettingsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,6 +38,12 @@ class SettingsBottomSheetFragment : BottomSheetDialogFragment() {
         }
         binding.btnClose.setOnClickListener {
             dismiss()
+        }
+        binding.switchMaterial.apply {
+            isChecked = viewModel.getAutoOpenEnable()
+            setOnCheckedChangeListener { _, isChecked ->
+                viewModel.setAutoOpenEnable(isChecked)
+            }
         }
     }
 

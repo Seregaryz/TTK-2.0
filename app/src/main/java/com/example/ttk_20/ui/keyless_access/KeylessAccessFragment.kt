@@ -75,6 +75,10 @@ class KeylessAccessFragment : Fragment(), BeaconConsumer,
             QrCodeBottomSheetFragment().show(childFragmentManager, null)
         }
         bluetoothHelper.initializeBluetooth(this)
+        binding.progressBar.apply {
+            loop(true)
+            playAnimation()
+        }
     }
 
     override fun onResume() {
