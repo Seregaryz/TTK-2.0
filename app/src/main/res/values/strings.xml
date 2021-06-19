@@ -12,4 +12,5 @@
     <string name="tv_use_qr">Поднесите экран телефона к \nсчитывающему устройству</string>
     <string name="tv_qr">QR-код</string>
     <string name="tv_qr_description">Родным и близким</string>
+    <string name="tv_key">Ключ</string>
 </resources>

@@ -44,9 +44,9 @@
     </LinearLayout>
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_qrbase"
+        android:id="@+id/imageQr"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="64dp"/>
 

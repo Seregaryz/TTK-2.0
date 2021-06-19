@@ -7,10 +7,4 @@
             android:gravity="center"
             android:src="@mipmap/key"/>
     </item>
-    <item android:top="512dp"
-        android:bottom="32dp">
-        <bitmap
-            android:gravity="bottom"
-            android:src="@mipmap/ttk"/>
-    </item>
 </layer-list>

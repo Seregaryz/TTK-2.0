@@ -17,7 +17,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.model.KeyPath
@@ -29,20 +28,22 @@ import com.example.ttk_20.ui.settings.SettingsBottomSheetFragment
 import com.example.ttk_20.utils.addSystemTopPadding
 import com.example.ttk_20.utils.visible
 import com.example.ttk_20.R
+import com.example.ttk_20.ui._base.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import org.altbeacon.beacon.*
 import timber.log.Timber
 import javax.inject.Inject
 
-
 @AndroidEntryPoint
-class KeylessAccessFragment : Fragment(), BeaconConsumer,
+class KeylessAccessFragment : BaseFragment(), BeaconConsumer,
     BluetoothListener.OnBluetoothSupportedCheckListener,
     BluetoothListener.OnBluetoothEnabledCheckListener,
     BluetoothListener.BluetoothTrigger {
 
     private lateinit var _binding: FrKeylessAccessBinding
     private val binding get() = _binding
+
+    private var isRepeat = true
 
     private val viewModel: KeylessAccessViewModel by viewModels()
 
@@ -88,70 +89,162 @@ class KeylessAccessFragment : Fragment(), BeaconConsumer,
         }
         bluetoothHelper.initializeBluetooth(this)
         binding.btnOpenDoor.setOnClickListener {
-            binding.apply {
-                progressBar.visible(true)
-                doorIcon.visible(false)
-                progressBar.apply {
-                    playAnimation()
-                    addAnimatorListener(object : Animator.AnimatorListener {
-                        override fun onAnimationStart(animation: Animator?) {
-                        }
-
-                        override fun onAnimationEnd(animation: Animator?) {
-                            tvOpen.apply {
-                                text = getString(R.string.tv_opened)
-                                setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
-                            }
-                        }
-
-                        override fun onAnimationCancel(animation: Animator?) {
-                        }
-
-                        override fun onAnimationRepeat(animation: Animator?) {
-                        }
-
-                    })
-//                    addAnimatorPauseListener(object : Animator.AnimatorPauseListener {
-//                        override fun onAnimationPause(animation: Animator?) {
-//                            tvOpen.apply {
-//                                text = getString(R.string.tv_opened)
-//                                setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
-//                            }
-//                        }
-//
-//                        override fun onAnimationResume(animation: Animator?) {
-//                            TODO("Not yet implemented")
-//                        }
-//
-//                    })
-                    addValueCallback(
+            viewModel.openDoor()
+        }
+        binding.apply {
+             progressBar.addAnimatorPauseListener(object : Animator.AnimatorPauseListener {
+                override fun onAnimationPause(animation: Animator?) {
+                    tvOpen.apply {
+                        text = getString(R.string.tv_opened)
+                        setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
+                    }
+                    progressBar.addValueCallback(
                         KeyPath("**"),
                         LottieProperty.COLOR_FILTER,
                         {
-                             if (it.overallProgress < 0.6)
                             PorterDuffColorFilter(
                                 ContextCompat.getColor(
                                     requireContext(),
-                                    com.example.ttk_20.R.color.colorSenary
+                                    R.color.green
                                 ),
                                 PorterDuff.Mode.SRC_ATOP
-                            ) else  PorterDuffColorFilter(
-                                 ContextCompat.getColor(
-                                     requireContext(),
-                                     com.example.ttk_20.R.color.green
-                                 ),
-                                 PorterDuff.Mode.SRC_ATOP
-                             )
-                        }
-                    )
+                            )
+                        })
                 }
-            }
+
+                override fun onAnimationResume(animation: Animator?) {
+                    tvOpen.apply {
+                        text = getString(R.string.tv_open)
+                        setTextColor(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.colorSenary
+                            )
+                        )
+                    }
+                    progressBar.addValueCallback(
+                        KeyPath("**"),
+                        LottieProperty.COLOR_FILTER,
+                        {
+                            PorterDuffColorFilter(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    R.color.colorSenary
+                                ),
+                                PorterDuff.Mode.SRC_ATOP
+                            )
+                        })
+                }
+
+            })
+
+            progressBar.addAnimatorListener(object : Animator.AnimatorListener {
+                override fun onAnimationStart(animation: Animator?) {
+                }
+
+                override fun onAnimationEnd(animation: Animator?) {
+                    progressBar.visible(false)
+                    doorIcon.visible(true)
+//                    tvOpen.apply {
+//                        text = getString(R.string.tv_open)
+//                        setTextColor(
+//                            ContextCompat.getColor(
+//                                requireContext(),
+//                                R.color.colorSenary
+//                            )
+//                        )
+//                    }
+//                    progressBar.addValueCallback(
+//                        KeyPath("**"),
+//                        LottieProperty.COLOR_FILTER,
+//                        {
+//                            PorterDuffColorFilter(
+//                                ContextCompat.getColor(
+//                                    requireContext(),
+//                                    R.color.colorSenary
+//                                ),
+//                                PorterDuff.Mode.SRC_ATOP
+//                            )
+//                        })
+                }
+
+                override fun onAnimationCancel(animation: Animator?) {
+                }
+
+                override fun onAnimationRepeat(animation: Animator?) {
+                    progressBar.pauseAnimation()
+                    viewModel.makeAnimationOffset()
+                    if (isRepeat) {
+                        tvOpen.apply {
+                            text = getString(R.string.tv_opened)
+                            setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
+                        }
+                        progressBar.addValueCallback(
+                            KeyPath("**"),
+                            LottieProperty.COLOR_FILTER,
+                            {
+                                PorterDuffColorFilter(
+                                    ContextCompat.getColor(
+                                        requireContext(),
+                                        R.color.green
+                                    ),
+                                    PorterDuff.Mode.SRC_ATOP
+                                )
+                            })
+                    }
+                    isRepeat = false
+                }
+
+            })
+
         }
     }
 
     override fun onResume() {
         super.onResume()
         enableBluetooth()
+        viewModel.apply {
+            animationOffset.subscribe {
+                if (it) {
+                    binding.progressBar.apply {
+                        resumeAnimation()
+                        binding.tvOpen.apply {
+                            text = getString(R.string.tv_open)
+                            setTextColor(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    R.color.colorSenary
+                                )
+                            )
+                        }
+                        addValueCallback(
+                            KeyPath("**"),
+                            LottieProperty.COLOR_FILTER,
+                            {
+                                PorterDuffColorFilter(
+                                    ContextCompat.getColor(
+                                        requireContext(),
+                                        R.color.colorSenary
+                                    ),
+                                    PorterDuff.Mode.SRC_ATOP
+                                )
+                            })
+                    }
+                    dispose()
+                } else {
+                    viewModel.makeAnimationOffset()
+                }
+            }
+            successOpen.subscribe {
+                binding.apply {
+                    progressBar.visible(true)
+                    doorIcon.visible(false)
+                    progressBar.apply {
+                        playAnimation()
+                    }
+                }
+            }.disposeOnPause()
+        }
     }
 
     override fun onBeaconServiceConnect() {
@@ -170,15 +263,16 @@ class KeylessAccessFragment : Fragment(), BeaconConsumer,
     private fun startTransmit() {
         beaconManager.bind(this)
         val beacon = Beacon.Builder()
-            .setId1("2f234454-cf6d-4a0f-adf2-f4911ba9ffa6")
-            .setId2("1")
-            .setId3("2")
+            .setId1("D35B76E2-E01C-9FAC-BA8D-7CE20BDBA0C6")
+            .setId2("2021")
+            .setId3("100")
             .setManufacturer(0x004c)
             .setTxPower(-59)
             .build()
         val beaconParser = BeaconParser()
             .setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24")
         val beaconTransmitter = BeaconTransmitter(requireContext(), beaconParser)
+        beaconTransmitter.advertiseMode = AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY
         beaconTransmitter.startAdvertising(beacon, object : AdvertiseCallback() {
             override fun onStartFailure(errorCode: Int) {
                 Timber.e("Advertisement start failed with code: $errorCode")

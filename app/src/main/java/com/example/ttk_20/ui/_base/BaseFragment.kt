@@ -10,7 +10,7 @@ import io.reactivex.disposables.Disposable
 private const val STATE_SCOPE_NAME = "state_scope_name"
 private const val PROGRESS_TAG = "bf_progress"
 
-open class BaseFragment(@LayoutRes containerLayoutId: Int) : Fragment(containerLayoutId) {
+open class BaseFragment() : Fragment() {
 
     private var instanceStateSaved: Boolean = false
     lateinit var fragmentInstanceKey: String

@@ -12,7 +12,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="@string/tv_home" >
+        app:title="@string/tv_key" >
 
         <ImageView
             android:id="@+id/btnSettings"
@@ -29,17 +29,16 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:paddingHorizontal="16dp"
         android:layout_marginTop="16dp"
         android:baselineAligned="false">
 
         <LinearLayout
             android:id="@+id/btnOpenDoor"
-            android:layout_width="0dp"
-            android:layout_height="126dp"
-            android:layout_weight="1"
-            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:paddingHorizontal="16dp"
             android:padding="16dp"
             android:background="@drawable/bg_card">
@@ -47,7 +46,7 @@
             <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp">
+                android:layout_gravity="center_vertical">
 
                 <ImageView
                     android:id="@+id/doorIcon"
@@ -61,57 +60,78 @@
                     android:layout_height="24dp"
                     app:lottie_autoPlay="true"
                     app:lottie_rawRes="@raw/door"
+                    app:lottie_repeatCount="2"
+
+                    app:lottie_colorFilter="@color/colorSenary"
                     app:lottie_repeatMode="reverse"
                     android:visibility="invisible"
                     app:lottie_speed="0.5" />
 
             </FrameLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/body1"
-                android:text="@string/tv_entrance"/>
+                android:layout_marginStart="16dp"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvOpen"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Caption1"
-                android:text="@string/tv_open"
-                android:textColor="@color/colorSenary"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/body1"
+                    android:text="@string/tv_entrance"/>
+
+                <TextView
+                    android:id="@+id/tvOpen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Caption1"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/tv_open"
+                    android:textColor="@color/colorSenary"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/btnGetQr"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
             android:paddingHorizontal="16dp"
-            android:layout_marginStart="16dp"
             android:padding="16dp"
             android:background="@drawable/bg_card">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
+                android:layout_gravity="center_vertical"
                 android:src="@drawable/ic_qr"/>
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/body1"
-                android:text="@string/tv_qr"/>
+                android:layout_marginStart="16dp"
+                android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Caption1"
-                android:text="@string/tv_qr_description"
-                android:textColor="@color/colorSecondary"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/body1"
+                    android:text="@string/tv_qr"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Caption1"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/tv_qr_description"
+                    android:textColor="@color/colorSecondary"/>
+
+
+            </LinearLayout>
 
         </LinearLayout>
 
