@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TTK-2.0</string>
+    <string name="app_name">Ключ</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="tv_home">Дом</string>
     <string name="tv_entrance">Подъезд</string>
@@ -10,7 +10,7 @@
     <string name="tv_settings_description">Чтобы открывать дверь без запуска приложения, включите Bluetooth</string>
     <string name="tv_share">Поделиться</string>
     <string name="tv_use_qr">Поднесите экран телефона к \nсчитывающему устройству</string>
-    <string name="tv_qr">QR-код</string>
-    <string name="tv_qr_description">Родным и близким</string>
+    <string name="tv_qr">Вход по QR-коду</string>
+    <string name="tv_qr_description">Гостевой доступ</string>
     <string name="tv_key">Ключ</string>
 </resources>
