@@ -37,7 +37,7 @@ class KeylessAccessViewModel @Inject constructor(
 
     fun makeAnimationOffset() {
         disposable = interactor.checkDoorClosed()
-            .delay(2, TimeUnit.SECONDS)
+            .delay(4, TimeUnit.SECONDS)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
@@ -46,6 +46,10 @@ class KeylessAccessViewModel @Inject constructor(
     }
 
     fun dispose() {
+        disposable?.dispose()
+    }
+
+    override fun onCleared() {
         disposable?.dispose()
     }
 

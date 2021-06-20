@@ -8,6 +8,8 @@ import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.VectorDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.view.LayoutInflater
@@ -18,6 +20,8 @@ import android.widget.Toast
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
 import androidx.core.app.ActivityCompat
+import androidx.core.content.FileProvider
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
@@ -34,6 +38,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.*
+import java.util.*
 
 
 @AndroidEntryPoint
@@ -60,58 +65,47 @@ class QrCodeBottomSheetFragment : BottomSheetDialogFragment() {
         binding.btnClose.setOnClickListener {
             dismiss()
         }
+        val f = createImageFile()
         binding.btnShareQr.setOnClickListener {
-//            Glide.with(this)
-//                .asBitmap()
-//                .load("${BuildConfig.BASE_URL}v1/code")
-//                .diskCacheStrategy(DiskCacheStrategy.NONE)
-//                .skipMemoryCache(true)
-//                .into(object : CustomTarget<Bitmap>() {
-//                    override fun onResourceReady(
-//                        resource: Bitmap,
-//                        transition: Transition<in Bitmap>?
-//                    ) {
-//                            val share = Intent(Intent.ACTION_SEND)
-//                            share.type = "image/png"
-//                            val f = createImageFile()
-//                            val bos = ByteArrayOutputStream()
-//                            resource.compress(CompressFormat.PNG, 0 /*ignored for PNG*/, bos)
-//                            val bitmapdata = bos.toByteArray()
-//
-//                            val fos = FileOutputStream(f)
-//                            fos.write(bitmapdata)
-//                            fos.flush()
-//                            fos.close()
-//                            share.putExtra(Intent.EXTRA_STREAM, f.toUri())
-//                            startActivity(Intent.createChooser(share, "Share Image"))
-//
-//                    }
-//
-//                    override fun onLoadCleared(placeholder: Drawable?) {
-//                        // this is called when imageView is cleared on lifecycle call or for
-//                        // some other reason.
-//                        // if you are referencing the bitmap somewhere else too other than this imageView
-//                        // clear it here as you can no longer have the bitmap
-//                    }
-//                })
-            if (verifyPermissions()) downloadImage("BuildConfig.BASE_URL}v1/code")
+            Glide.with(this)
+                .asBitmap()
+                .load("${BuildConfig.BASE_URL}v1/code")
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: Transition<in Bitmap>?
+                    ) {
+                        val share = Intent(Intent.ACTION_SEND)
+                        share.type = "image/png"
+                        //val f = createImageFile()
+                        val bos = ByteArrayOutputStream()
+                        //binding.imageQr.invalidate()
+//                        val bitmap = (binding.imageQr.drawable as VectorDrawable).toBitmap(300, 300)
+                        resource.compress(CompressFormat.PNG, 0 /*ignored for PNG*/, bos)
+                        val bitmapdata = bos.toByteArray()
+                        val fos = FileOutputStream(f)
+                        try {
+                            fos.write(bitmapdata)
+                            fos.flush()
+                            fos.close()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                        val photoURI: Uri = FileProvider.getUriForFile(
+                            requireContext(),
+                            "${requireContext().packageName}.fileprovider",
+                            f
+                        )
+                        share.putExtra(Intent.EXTRA_STREAM, photoURI)
+                        startActivity(Intent.createChooser(share, "Share Image"))
 
-//            val share = Intent(Intent.ACTION_SEND)
-//            share.type = "image/png"
-//            val f = createImageFile()
-//            val bos = ByteArrayOutputStream()
-//            binding.imageQr.drawable.toBitmap(300, 300).compress(CompressFormat.PNG, 0 /*ignored for PNG*/, bos)
-//            val bitmapdata = bos.toByteArray()
-//
-////write the bytes in file
-//
-////write the bytes in file
-//            val fos = FileOutputStream(f)
-//            fos.write(bitmapdata)
-//            fos.flush()
-//            fos.close()
-//            share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(f))
-//            startActivity(Intent.createChooser(share, "Share Image"))
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {
+                    }
+                })
         }
     }
 
@@ -141,11 +135,6 @@ class QrCodeBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onResume() {
         super.onResume()
         binding.imageQr.glideAvatarLarge("code")
-//        viewModel.apply {
-//            qrCode.subscribe {
-//
-//            }
-//        }
     }
 
     @Throws(IOException::class)
@@ -156,80 +145,6 @@ class QrCodeBottomSheetFragment : BottomSheetDialogFragment() {
             ".png",
             storageDir
         )
-    }
-
-    fun downloadImage(imageURL: String) {
-        if (!verifyPermissions()) {
-            return
-        }
-        val dirPath =
-            Environment.getExternalStorageDirectory().absolutePath + "/" + getString(R.string.app_name) + "/"
-        //val dir = File(dirPath)
-        val dir = createImageFile()
-        val fileName = dir.absolutePath.substring(imageURL.lastIndexOf('/') + 1)
-        Glide.with(this)
-            .asDrawable()
-            .load(imageURL)
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .skipMemoryCache(true)
-            .into(object : CustomTarget<Drawable?>() {
-
-                override fun onLoadCleared(@Nullable placeholder: Drawable?) {}
-                override fun onLoadFailed(@Nullable errorDrawable: Drawable?) {
-                    super.onLoadFailed(errorDrawable)
-                    Toast.makeText(
-                        requireContext(),
-                        "Failed to Download Image! Please try again later.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-                override fun onResourceReady(
-                    resource: Drawable,
-                    transition: Transition<in Drawable?>?
-                ) {
-                    val bitmap = (resource as BitmapDrawable).bitmap
-                    Toast.makeText(requireContext(), "Saving Image...", Toast.LENGTH_SHORT).show()
-                    saveImage(bitmap, dir, fileName)
-                }
-            })
-    }
-
-    fun verifyPermissions(): Boolean {
-
-        // This will return the current Status
-        val permissionExternalMemory =
-            ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        if (permissionExternalMemory != PackageManager.PERMISSION_GRANTED) {
-            val STORAGE_PERMISSIONS = arrayOf<String>(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            // If permission not granted then ask for permission real time.
-            ActivityCompat.requestPermissions(requireActivity(), STORAGE_PERMISSIONS, 1)
-            return false
-        }
-        return true
-    }
-
-    private fun saveImage(image: Bitmap, storageDir: File, imageFileName: String) {
-        var successDirCreated = false
-        if (!storageDir.exists()) {
-            successDirCreated = storageDir.mkdir()
-        }
-        if (successDirCreated) {
-            val imageFile = File(storageDir, imageFileName)
-            val savedImagePath = imageFile.absolutePath
-            try {
-                val fOut: OutputStream = FileOutputStream(imageFile)
-                image.compress(CompressFormat.JPEG, 100, fOut)
-                fOut.close()
-                Toast.makeText(requireContext(), "Image Saved!", Toast.LENGTH_SHORT).show()
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error while saving image!", Toast.LENGTH_SHORT)
-                    .show()
-                e.printStackTrace()
-            }
-        } else {
-            Toast.makeText(requireContext(), "Failed to make folder!", Toast.LENGTH_SHORT).show()
-        }
     }
 
 }
